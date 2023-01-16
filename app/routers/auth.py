@@ -1,3 +1,4 @@
+import hashlib
 from fastapi import Response, status, HTTPException, Depends, APIRouter
 from .. import utils, oauth2
 from app.models import models
@@ -25,3 +26,31 @@ def login(user_creds: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
     access_token = oauth2.create_access_token(data={"user_id": user.id})
 
     return {"email": user.email, "access_token": access_token, "token_type": "Bearer"}
+
+
+@router.get('/verifyemail/{token}')
+def verify_me(token: str, db: Session = Depends(get_db)):
+    hashedCode = hashlib.sha256()
+    hashedCode.update(bytes.fromhex(token))
+    verification_code = hashedCode.hexdigest()
+
+    user_query = db.query(models.User).filter(
+        models.User.otpCode == verification_code)
+    user = user_query.first()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail='Invalid verification code or user does not exist')
+
+    if user.emailVerified:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail='Email already verified')
+
+    user_query.update({'emailVerified': True, 'otpCode': None},
+                      synchronize_session=False)
+    db.commit()
+
+    return {
+        "status": "success",
+        "message": "Account verified successfully"
+    }

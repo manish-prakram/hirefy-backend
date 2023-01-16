@@ -1,9 +1,13 @@
-from fastapi import Response, status, HTTPException, Depends, APIRouter
+import hashlib
+import smtplib
+from random import randbytes
+from fastapi import Response, status, HTTPException, Depends, APIRouter, Request
 from .. import utils, oauth2
 from app.models import models
 from app.schemas import schemas
 from ..database import get_db, engine
 from sqlalchemy.orm import Session
+from app.email import Email
 
 router = APIRouter(
     prefix='/users',
@@ -11,11 +15,13 @@ router = APIRouter(
 )
 
 
-@router.post('/', status_code=status.HTTP_201_CREATED, response_model=schemas.UserResponse)
-def create_user(user: schemas.CreateUser, db: Session = Depends(get_db)):
+@router.post('/', status_code=status.HTTP_201_CREATED)
+async def create_user(request: Request, user: schemas.CreateUser, db: Session = Depends(get_db)):
 
-    user_exist = db.query(models.User).filter(
-        models.User.email == user.email).first()
+    user_query = db.query(models.User).filter(
+        models.User.email == user.email)
+
+    user_exist = user_query.first()
 
     if user_exist:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
@@ -24,12 +30,37 @@ def create_user(user: schemas.CreateUser, db: Session = Depends(get_db)):
     # password hashing
     hashed_password = utils.hash(user.password)
     user.password = hashed_password
-
     new_user = models.User(**user.dict())
+
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    return new_user
+
+    try:
+        token = randbytes(10)
+        hashedCode = hashlib.sha256()
+        hashedCode.update(token)
+        verification_code = hashedCode.hexdigest()
+        print(verification_code)
+
+        user_query.update({'otpCode': verification_code},
+                          synchronize_session=False)
+        db.commit()
+
+        url = f"{request.url.scheme}://{request.client.host}:{request.url.port}/verifyemail/{token.hex()}"
+        print(url)
+
+        await Email(new_user, url, [user.email]).sendVerificationCode()
+
+    except Exception as error:
+        print('Error', error)
+        user_query.update({'otpCode': None}, synchronize_session=False)
+        db.commit()
+
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail='There was an error sending email')
+
+    return {'status': 'success', 'message': 'Verification token successfully sent to your email'}
 
 
 @router.patch('/profile-type', status_code=status.HTTP_200_OK)
