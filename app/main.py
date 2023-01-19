@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from . import models
 from .database import engine
-from .routers import users, auth, recruiter, post
+from .routers import users, auth, recruiter, post, company
 
 from .config import settings
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,10 +26,12 @@ app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(recruiter.router)
 app.include_router(post.router)
+app.include_router(company.router)
 
 
 @app.get('/')
 def root():
     return {"message": "Hello  😁 "}
+
 
 handler = Mangum(app=app)

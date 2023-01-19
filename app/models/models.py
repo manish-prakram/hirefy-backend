@@ -38,6 +38,9 @@ class RecruiterProfile(Base):
     owner_id = Column(Integer, ForeignKey(
         "users.id", ondelete="CASCADE"), nullable=False)
     owner = relationship("User")
+    isCompanyAdmin = Column(Boolean, server_default='FALSE', nullable=False)
+    company = relationship(
+        "Company", back_populates="recruiter", uselist=False)
 
 
 class User(Base):
@@ -79,3 +82,35 @@ class Review(Base):
         "posts.id", ondelete="CASCADE"), primary_key=True)
     ratings = Column(Integer)
     reviews = Column(String)
+
+
+class Company(Base):
+    __tablename__ = 'companies'
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    owner = relationship("User")
+    recruiter = relationship("RecruiterProfile", back_populates="company")
+    recruiterId = Column(Integer, ForeignKey(
+        "recruiter_profile.id", ondelete="CASCADE"))
+    adminId = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+    companyName = Column(String)
+    industry = Column(String)
+    totalEmployees = Column(Integer)
+    headquartered = Column(String)
+    companyBio = Column(String)
+    companyEmail = Column(String)
+    profilePicUrl = Column(String)
+    bannerPicUrl = Column(String)
+    companyPics = Column(String)
+    founders = Column(String)
+    phone_number = Column(String)
+    email = Column(String)
+    companyGst = Column(String)
+    websiteLink = Column(String)
+    phoneVerified = Column(Boolean, server_default='FALSE', nullable=False)
+    isVerified = Column(Boolean, server_default='FALSE', nullable=False)
+    isBlocked = Column(Boolean, server_default='FALSE', nullable=False)
+    lastLogin = Column(TIMESTAMP(timezone=True),
+                       server_default=text('now()'), nullable=False)
+    createdAt = Column(TIMESTAMP(timezone=True),
+                       server_default=text('now()'), nullable=False)
