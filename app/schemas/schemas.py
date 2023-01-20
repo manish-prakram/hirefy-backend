@@ -24,7 +24,7 @@ class UserProfileType(BaseModel):
 
 
 class UserResponse(BaseModel):
-    id: str
+    
     email: EmailStr
     phone_number: str = None
     firstName: str = None

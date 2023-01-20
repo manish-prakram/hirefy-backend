@@ -14,9 +14,9 @@ router = APIRouter(
 )
 
 
+# ! Get All Posts Without Login
 @router.get('/', response_model=List[schemas.PostOut])
-def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user),
-              limit: int = 10, skip: int = 0, search: Optional[str] = ""):
+def get_all_posts(db: Session = Depends(get_db), limit: int = 10, skip: int = 0, search: Optional[str] = ""):
 
     result = db.query(models.Post, func.count(models.Review.post_id).label("reviews")).join(
         models.Review, models.Review.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(
@@ -27,6 +27,35 @@ def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.
     return result
 
 
+# ! Get my all posts
+@router.get('/my', status_code=status.HTTP_200_OK)
+async def get_my_all_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+
+    post = db.query(models.Post, func.count(models.Review.post_id).label("reviews")).join(
+        models.Review, models.Review.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.owner_id == current_user.id).all()
+
+    if not post:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"No data found with id: {id}")
+
+    return post
+
+
+#! Get one Post without Login
+@router.get('/{id}', status_code=status.HTTP_200_OK, response_model=schemas.PostOut)
+async def get_one_post(id: int, db: Session = Depends(get_db), ):
+
+    post = db.query(models.Post, func.count(models.Review.post_id).label("reviews")).join(
+        models.Review, models.Review.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.id == id).first()
+
+    if not post:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"No data found with id: {id}")
+
+    return post
+
+
+#! Create New Post
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=schemas.PostResponse)
 def create_post(post_body: schemas.PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
 
@@ -38,3 +67,42 @@ def create_post(post_body: schemas.PostCreate, db: Session = Depends(get_db), cu
 
     return new_post
 
+
+#! Update my post
+@router.patch('/{id}', response_model=schemas.PostResponse)
+async def update_post(id: int, update_post: schemas.PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+
+    post_query = db.query(models.Post).filter(models.Post.id == id)
+    post = post_query.first()
+
+    if post == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f'0 posts found with id: {id}')
+
+    if post.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail=f'Forbidden Request!!!')
+
+    post_query.update(update_post.dict(), synchronize_session=False)
+    db.commit()
+
+    return post_query.first()
+
+
+# ! Delete my post
+@router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_post(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+    post_query = db.query(models.Post).filter(models.Post.id == id)
+    post = post_query.first()
+
+    if post == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"No data found with id: {id}")
+    if post.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail=f"Forbidden Request!")
+
+    post_query.delete(synchronize_session=False)
+    db.commit()
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
