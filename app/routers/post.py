@@ -37,3 +37,4 @@ def create_post(post_body: schemas.PostCreate, db: Session = Depends(get_db), cu
     db.refresh(new_post)
 
     return new_post
+

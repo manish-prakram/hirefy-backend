@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from . import models
 from .database import engine
 from .routers import users, auth, recruiter, post, company
@@ -6,11 +6,16 @@ from .routers import users, auth, recruiter, post, company
 from .config import settings
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
-
+from fastapi.templating import Jinja2Templates
 # models.Base.metadata.create_all(bind=engine)
-
-
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
 app = FastAPI()
+
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+templates = Jinja2Templates(directory="app/templates/")
+
 
 origins = ["*"]
 
@@ -29,9 +34,9 @@ app.include_router(post.router)
 app.include_router(company.router)
 
 
-@app.get('/')
-def root():
-    return {"message": "Hello  😁 "}
+@ app.get('/', response_class=HTMLResponse)
+def root(request: Request):
+    return templates.TemplateResponse('index.html', context={'request': request})
 
 
 handler = Mangum(app=app)
