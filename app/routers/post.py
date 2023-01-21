@@ -1,6 +1,6 @@
 from typing import List, Optional
 from fastapi import Response, status, HTTPException, Depends, APIRouter
-from ..schemas import schemas
+from ..schemas import posts_schema
 from ..models import models
 
 from ..database import get_db, engine
@@ -15,7 +15,7 @@ router = APIRouter(
 
 
 # ! Get All Posts Without Login
-@router.get('/', response_model=List[schemas.PostOut])
+@router.get('/', response_model=List[posts_schema.PostOut])
 def get_all_posts(db: Session = Depends(get_db), limit: int = 10, skip: int = 0, search: Optional[str] = ""):
 
     result = db.query(models.Post, func.count(models.Review.post_id).label("reviews")).join(
@@ -42,7 +42,7 @@ async def get_my_all_posts(db: Session = Depends(get_db), current_user: int = De
 
 
 #! Get one Post without Login
-@router.get('/{id}', status_code=status.HTTP_200_OK, response_model=schemas.PostOut)
+@router.get('/{id}', status_code=status.HTTP_200_OK, response_model=posts_schema.PostOut)
 async def get_one_post(id: int, db: Session = Depends(get_db), ):
 
     post = db.query(models.Post, func.count(models.Review.post_id).label("reviews")).join(
@@ -56,10 +56,14 @@ async def get_one_post(id: int, db: Session = Depends(get_db), ):
 
 
 #! Create New Post
-@router.post('/', status_code=status.HTTP_201_CREATED, response_model=schemas.PostResponse)
-def create_post(post_body: schemas.PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+@router.post('/', status_code=status.HTTP_201_CREATED, response_model=posts_schema.PostResponse)
+def create_post(post_body: posts_schema.PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
 
-    new_post = models.Post(owner_id=current_user.id, **post_body.dict())
+    query_recruiter = db.query(models.RecruiterProfile).filter(
+        models.RecruiterProfile.owner_id == current_user.id).first()
+
+    new_post = models.Post(owner_id=current_user.id,
+                           recruiterId=query_recruiter.id, **post_body.dict())
 
     db.add(new_post)
     db.commit()
@@ -69,8 +73,8 @@ def create_post(post_body: schemas.PostCreate, db: Session = Depends(get_db), cu
 
 
 #! Update my post
-@router.patch('/{id}', response_model=schemas.PostResponse)
-async def update_post(id: int, update_post: schemas.PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+@router.patch('/{id}', response_model=posts_schema.PostResponse)
+async def update_post(id: int, update_post: posts_schema.PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
 
     post_query = db.query(models.Post).filter(models.Post.id == id)
     post = post_query.first()

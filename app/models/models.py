@@ -10,13 +10,36 @@ class Post(Base):
 
     id = Column(Integer, primary_key=True, nullable=False)
     title = Column(String, nullable=False)
-    content = Column(String, nullable=False)
+    description = Column(String, nullable=False)
+    salaryRange = Column(String, nullable=False)
+    communicationLang = Column(String)
+    joiningPeriod = Column(String)
+    workLocation = Column(String)
+    officeLocation = Column(String)
+    jobType = Column(String)
+    jobLevel = Column(String)
+    jobStage = Column(String)
+    jobDomain = Column(String)
+    educationLevel = Column(String)
+    experienceLevel = Column(String)
+    numberOfPositionOpen = Column(String)
+    rolesAndResponsibilities = Column(String)
+    reportingTo = Column(String)
+    screeningRounds = Column(String)
+    backgroundVerificationApplicable = Column(
+        Boolean, server_default='TRUE', nullable=False)
+    benifitsProvided = Column(String)
     published = Column(Boolean, server_default='TRUE', nullable=False)
-    created_at = Column(TIMESTAMP(timezone=True),
-                        server_default=text('now()'), nullable=False)
+    createdAt = Column(TIMESTAMP(timezone=True),
+                       server_default=text('now()'), nullable=False)
+    postTimePeriod = Column(TIMESTAMP(timezone=True),
+                            server_default=text('now()'), nullable=False)
     owner_id = Column(Integer, ForeignKey(
         "users.id", ondelete="CASCADE"), nullable=False)
+    recruiterId = Column(Integer, ForeignKey(
+        "recruiter_profile.id", ondelete="CASCADE"), nullable=False)
     owner = relationship("User")
+    recruiter = relationship("RecruiterProfile")
 
 
 class RecruiterProfile(Base):

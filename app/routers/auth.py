@@ -1,5 +1,6 @@
 import hashlib
 from fastapi import Response, status, HTTPException, Depends, APIRouter
+from fastapi.responses import JSONResponse
 from .. import utils, oauth2
 from app.models import models
 from app.schemas import schemas

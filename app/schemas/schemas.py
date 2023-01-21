@@ -5,16 +5,6 @@ from pydantic.types import conint
 from ..schemas import recruiter_schema
 
 
-class PostBase(BaseModel):
-    title: str
-    content: str
-    published: bool = True  # Use default value for optional parameter
-    # rating: Optional[int] = None  # USe Optional import from typing
-
-
-class PostCreate(PostBase):
-    pass
-
 
 class UserProfileType(BaseModel):
     profileType: str
@@ -34,24 +24,6 @@ class UserResponse(BaseModel):
     class Config:
         orm_mode = True
 
-
-class PostResponse(PostBase):
-    id: int
-    created_at: datetime
-    owner_id: int
-    owner: UserResponse
-
-    class Config:
-        orm_mode = True
-
-
-class PostOut(BaseModel):
-    Post: PostResponse
-    reviews: int
-    # RecruiterProfile: recruiter_schema.RecruiterResponse
-
-    class Config:
-        orm_mode = True
 
 
 class CreateUser(BaseModel):
