@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, EmailStr
 from pydantic.types import conint
-from ..schemas import schemas
+from ..schemas import schemas, technical_skills_schema
 
 
 class CreateUserProfile(BaseModel):
@@ -67,6 +67,7 @@ class UpdateUserProfile(BaseModel):
         orm_mode = True
 
 
+
 class ResponseUserProfile(BaseModel):
     currentJobTitle: str
     totalExperience: str
@@ -94,6 +95,7 @@ class ResponseUserProfile(BaseModel):
     phd: str = None
     deplomaCourse: str = None
     owner: schemas.UserResponse
+    # techSkills: TechnicalSkillsResponse
 
     class Config:
         orm_mode = True

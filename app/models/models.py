@@ -133,6 +133,35 @@ class UserProfile(Base):
     createdAt = Column(TIMESTAMP(timezone=True),
                        server_default=text('now()'), nullable=False)
     owner = relationship("User")
+    techSkills = relationship(
+        "TechnicalSkills", back_populates="owner", uselist=False)
+
+
+class SoftSkills(Base):
+    __tablename__ = 'soft_skills'
+    id = Column(Integer, primary_key=True, nullable=False)
+    userProfileId = Column(Integer, ForeignKey(
+        "users_profile.id", ondelete="CASCADE"), nullable=False)
+    title = Column(String)
+    experience = Column(String)
+    experienceLevel = Column(String)
+    createdAt = Column(TIMESTAMP(timezone=True),
+                       server_default=text('now()'), nullable=False)
+    owner = relationship("UserProfile")
+
+
+class TechnicalSkills(Base):
+    __tablename__ = 'technical_skills'
+    id = Column(Integer, primary_key=True, nullable=False)
+    userProfileId = Column(Integer, ForeignKey(
+        "users_profile.id", ondelete="CASCADE"), nullable=False)
+    title = Column(String)
+    experience = Column(String)
+    experienceLevel = Column(String)
+    createdAt = Column(TIMESTAMP(timezone=True),
+                       server_default=text('now()'), nullable=False)
+    owner = relationship(
+        "UserProfile", back_populates="techSkills", uselist=False)
 
 
 class Review(Base):
