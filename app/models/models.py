@@ -95,6 +95,46 @@ class User(Base):
     profileId = Column(Integer)
 
 
+class UserProfile(Base):
+    __tablename__ = 'users_profile'
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    profileId = Column(Integer, ForeignKey(
+        "users.id", ondelete="CASCADE"), nullable=False)
+    currentJobTitle = Column(String)
+    totalExperience = Column(String)
+    currentCompany = Column(String)
+    currentIndustry = Column(String)
+    noticePeriod = Column(String)
+    negotiableNoticePeriod = Column(
+        Boolean, server_default='TRUE', nullable=False)
+    publicCompetitionLink = Column(String)
+    publicCompetitionScores = Column(String)
+    websiteUrl = Column(String)
+    linkedInUrl = Column(String)
+    githubUrl = Column(String)
+    twitterUrl = Column(String)
+    mediumUrl = Column(String)
+    behanceUrl = Column(String)
+    otherUrl = Column(String)
+    fixedPay = Column(String)
+    incentives = Column(String)
+    bonus = Column(String)
+    currency = Column(String)
+    expectedCtc = Column(String)
+    negotiableExpectedCtc = Column(
+        Boolean, server_default='TRUE', nullable=False)
+    bechelorsDegree = Column(String)
+    mastersDegree = Column(String)
+    phd = Column(String)
+    deplomaCourse = Column(String)
+    lastLogin = Column(TIMESTAMP(timezone=True),
+                       server_default=text('now()'), nullable=False)
+    createdAt = Column(TIMESTAMP(timezone=True),
+                       server_default=text('now()'), nullable=False)
+    owner = relationship("User")
+
+
 class Review(Base):
     __tablename__ = 'reviews'
 
