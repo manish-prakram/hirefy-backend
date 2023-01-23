@@ -3,7 +3,7 @@ from . import models
 from .database import engine
 from .routers import users, auth, recruiter, post, company
 
-from .routers.user_route import soft_skills, technical_skills, education, experience
+from .routers.user_route import soft_skills, technical_skills, education, experience, certificates, projects
 
 from .config import settings
 from fastapi.middleware.cors import CORSMiddleware
@@ -38,6 +38,8 @@ app.include_router(technical_skills.router)
 app.include_router(soft_skills.router)
 app.include_router(education.router)
 app.include_router(experience.router)
+app.include_router(certificates.router)
+app.include_router(projects.router)
 
 
 @ app.get('/', response_class=HTMLResponse)
