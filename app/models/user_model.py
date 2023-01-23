@@ -38,3 +38,42 @@ class Experience(Base):
     createdAt = Column(TIMESTAMP(timezone=True),
                        server_default=text('now()'), nullable=False)
     owner = relationship("UserProfile")
+
+
+class Certificates(Base):
+    __tablename__ = 'certificates'
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    userProfileId = Column(Integer, ForeignKey(
+        "users_profile.id", ondelete="CASCADE"), nullable=False)
+    title = Column(String)
+    subtitle = Column(String)
+    description = Column(String)
+    organization = Column(String)
+    licenceNumber = Column(String)
+    url = Column(String)
+    skills = Column(String)
+    startDate = Column(TIMESTAMP)
+    endDate = Column(TIMESTAMP)
+    createdAt = Column(TIMESTAMP(timezone=True),
+                       server_default=text('now()'), nullable=False)
+    owner = relationship("UserProfile")
+
+
+class Projects(Base):
+    __tablename__ = 'projects'
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    userProfileId = Column(Integer, ForeignKey(
+        "users_profile.id", ondelete="CASCADE"), nullable=False)
+    title = Column(String)
+    subtitle = Column(String)
+    description = Column(String)
+    organization = Column(String)
+    url = Column(String)
+    skills = Column(String)
+    startDate = Column(TIMESTAMP)
+    endDate = Column(TIMESTAMP)
+    createdAt = Column(TIMESTAMP(timezone=True),
+                       server_default=text('now()'), nullable=False)
+    owner = relationship("UserProfile")
