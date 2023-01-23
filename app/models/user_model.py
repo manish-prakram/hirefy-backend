@@ -19,3 +19,22 @@ class Education(Base):
     createdAt = Column(TIMESTAMP(timezone=True),
                        server_default=text('now()'), nullable=False)
     owner = relationship("UserProfile")
+
+
+class Experience(Base):
+    __tablename__ = 'experience'
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    userProfileId = Column(Integer, ForeignKey(
+        "users_profile.id", ondelete="CASCADE"), nullable=False)
+    title = Column(String)
+    company = Column(String)
+    jobType = Column(String)
+    jobLocation = Column(String)
+    jobDomain = Column(String)
+    skills = Column(String)
+    startDate = Column(TIMESTAMP)
+    endDate = Column(TIMESTAMP)
+    createdAt = Column(TIMESTAMP(timezone=True),
+                       server_default=text('now()'), nullable=False)
+    owner = relationship("UserProfile")
