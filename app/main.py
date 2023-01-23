@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from . import models
 from .database import engine
-from .routers import users, auth, recruiter, post, company
+from .routers import users, auth, recruiter, post, company, technical_skills, soft_skills
 
 from .config import settings
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,6 +32,8 @@ app.include_router(users.router)
 app.include_router(recruiter.router)
 app.include_router(post.router)
 app.include_router(company.router)
+app.include_router(technical_skills.router)
+app.include_router(soft_skills.router)
 
 
 @ app.get('/', response_class=HTMLResponse)
