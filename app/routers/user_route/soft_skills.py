@@ -3,42 +3,37 @@ import smtplib
 from random import randbytes
 from typing import List
 from fastapi import Response, status, HTTPException, Depends, APIRouter, Request
-from .. import utils, oauth2
+from ... import utils, oauth2
 from app.models import models
-from app.schemas import schemas, user_profile_schema, technical_skills_schema
-from ..database import get_db, engine
+from app.schemas import schemas, user_profile_schema
+from app.schemas.user_schemas import soft_skills_schema
+from ...database import get_db, engine
 from sqlalchemy.orm import Session
 from app.email import Email
 
 router = APIRouter(
     prefix='/users',
-    tags=['Users Technical Skills']
+    tags=['Users Soft Skills']
 )
 
-# ! Get Technical Skills
-@router.get('/techskills/{profileId}')
+
+# ! Get Soft Skills
+@router.get('/softskills/{profileId}')
 async def get_user_technical_skills(profileId: int, db: Session = Depends(get_db)):
 
-    # query_user = db.query(models.UserProfile).filter(models.UserProfile.profileId ==
-    #                                                  current_user.id).first()
+    query_softSkills = db.query(models.SoftSkills).filter(
+        models.SoftSkills.userProfileId == profileId).order_by(models.SoftSkills.id).all()
 
-    # if not query_user:
-    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-    #                         detail=f"Data does not exist")
-
-    query_techSkills = db.query(models.TechnicalSkills).filter(
-        models.TechnicalSkills.userProfileId == profileId).order_by(models.TechnicalSkills.id).all()
-
-    if not query_techSkills:
+    if not query_softSkills:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Data does not exist")
 
-    return query_techSkills
+    return query_softSkills
 
 
-# ! Create Technical Skills
-@router.post('/techskills/', status_code=status.HTTP_201_CREATED)
-async def add_technical_skill(body: technical_skills_schema.CreateTechnicalSkill, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user),):
+# ! Create Soft Skills
+@router.post('/softskills/', status_code=status.HTTP_201_CREATED)
+async def add_soft_skill(body: soft_skills_schema.CreateSoftSkill, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user),):
 
     query_user = db.query(models.UserProfile).filter(models.UserProfile.profileId ==
                                                      current_user.id).first()
@@ -47,7 +42,7 @@ async def add_technical_skill(body: technical_skills_schema.CreateTechnicalSkill
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f"Forbidden Request")
 
-    new_skill = models.TechnicalSkills(
+    new_skill = models.SoftSkills(
         userProfileId=query_user.id, **body.dict())
 
     db.add(new_skill)
@@ -57,9 +52,9 @@ async def add_technical_skill(body: technical_skills_schema.CreateTechnicalSkill
     return new_skill
 
 
-#! Update Technical Skills
-@router.patch('/techskills/{id}', status_code=status.HTTP_200_OK)
-async def update_technical_skill(id: int, body: technical_skills_schema.UpdateTechnicalSkill, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+#! Update Soft Skills
+@router.patch('/softskills/{id}', status_code=status.HTTP_200_OK)
+async def update_soft_skill(id: int, body: soft_skills_schema.UpdateSoftSkill, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
 
     query_userProfile = db.query(models.UserProfile).filter(
         models.UserProfile.profileId == current_user.id)
@@ -72,12 +67,12 @@ async def update_technical_skill(id: int, body: technical_skills_schema.UpdateTe
     print("Current User Id => " + str(current_user.id))
     print("User Profile Id => " + str(userProfile.id))
 
-    query_skills = db.query(models.TechnicalSkills).filter(
-        models.TechnicalSkills.id == id)
+    query_skills = db.query(models.SoftSkills).filter(
+        models.SoftSkills.id == id)
 
     skill = query_skills.first()
 
-    if skill == None:
+    if not skill:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f'0 skill found with id: {id}')
 
@@ -89,6 +84,7 @@ async def update_technical_skill(id: int, body: technical_skills_schema.UpdateTe
 
     query_skills.update(body.dict(exclude_unset=True),
                         synchronize_session=False)
+    print("updated")
 
     db.commit()
     db.refresh(skill)
@@ -96,9 +92,9 @@ async def update_technical_skill(id: int, body: technical_skills_schema.UpdateTe
     return skill
 
 
-#! Delete Technical Skills
-@router.delete('/techskills/{id}', status_code=status.HTTP_204_NO_CONTENT)
-async def delete_technical_skill(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+#! Delete Soft Skills
+@router.delete('/softskills/{id}', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_soft_skill(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
 
     query_userProfile = db.query(models.UserProfile).filter(
         models.UserProfile.profileId == current_user.id)
@@ -111,8 +107,8 @@ async def delete_technical_skill(id: int, db: Session = Depends(get_db), current
     print("Current User Id => " + str(current_user.id))
     print("User Profile Id => " + str(userProfile.id))
 
-    query_skills = db.query(models.TechnicalSkills).filter(
-        models.TechnicalSkills.id == id)
+    query_skills = db.query(models.SoftSkills).filter(
+        models.SoftSkills.id == id)
 
     skill = query_skills.first()
 

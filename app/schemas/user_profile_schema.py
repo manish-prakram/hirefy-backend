@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, EmailStr
 from pydantic.types import conint
-from ..schemas import schemas, technical_skills_schema
+from ..schemas import schemas
 
 
 class CreateUserProfile(BaseModel):

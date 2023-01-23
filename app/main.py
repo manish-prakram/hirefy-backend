@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Request
 from . import models
 from .database import engine
-from .routers import users, auth, recruiter, post, company, technical_skills, soft_skills
-from .routers.user_route import education
+from .routers import users, auth, recruiter, post, company
+from .routers.user_route import education, soft_skills, technical_skills
 
 from .config import settings
 from fastapi.middleware.cors import CORSMiddleware

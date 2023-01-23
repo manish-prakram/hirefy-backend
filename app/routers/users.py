@@ -5,7 +5,7 @@ from typing import List
 from fastapi import Response, status, HTTPException, Depends, APIRouter, Request
 from .. import utils, oauth2
 from app.models import models
-from app.schemas import schemas, user_profile_schema, technical_skills_schema
+from app.schemas import schemas, user_profile_schema
 from ..database import get_db, engine
 from sqlalchemy.orm import Session
 from app.email import Email
