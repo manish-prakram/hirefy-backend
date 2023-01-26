@@ -12,7 +12,7 @@ from fastapi.templating import Jinja2Templates
 # models.Base.metadata.create_all(bind=engine)
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
-app = FastAPI()
+app = FastAPI(title='Hire Block')
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
@@ -42,7 +42,7 @@ app.include_router(certificates.router)
 app.include_router(projects.router)
 
 
-@ app.get('/', response_class=HTMLResponse)
+@app.get('/', response_class=HTMLResponse)
 def root(request: Request):
     return templates.TemplateResponse('index.html', context={'request': request})
 

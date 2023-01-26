@@ -3,6 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 .vscode
+postgres_aws_cred.txt
+deta_micro.txt
 
 # Distribution / packaging
 .Python
