@@ -10,7 +10,7 @@ from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 router = APIRouter(tags=['Authentication'])
 
 
-@router.post('/login', response_model=schemas.Token)
+@router.post('/login')
 def login(user_creds: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
 
     user = db.query(models.User).filter(
@@ -36,6 +36,8 @@ def login(user_creds: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
         "access_token": access_token,
         "token_type": "Bearer",
         "emailVerified": user.emailVerified,
+        "first_name": user.firstName,
+        "profileType": user.profileType,
     }
 
 

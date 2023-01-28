@@ -27,6 +27,7 @@ class Email:
     async def sendMail(self, subject, template):
         # Define the config
         conf = ConnectionConfig(
+            MAIL_FROM_NAME='HireBlock',
             MAIL_USERNAME=settings.email_username,
             MAIL_PASSWORD=settings.email_password,
             MAIL_FROM=settings.email_from,
