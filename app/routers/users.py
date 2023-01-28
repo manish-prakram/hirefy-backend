@@ -48,7 +48,8 @@ async def create_user(request: Request, user: schemas.CreateUser, db: Session = 
                           synchronize_session=False)
         db.commit()
 
-        url = f"{request.url.scheme}://{request.client.host}:{request.url.port}/verifyemail/{token.hex()}"
+        # url = f"{request.url.scheme}://{request.client.host}:{request.url.port}/verifyemail/{token.hex()}" # uncomment after domain integration
+        url = f"{request.url.scheme}://15.207.116.185/verifyemail/{token.hex()}"
         print(url)
 
         await Email(new_user, url, [user.email]).sendVerificationCode()
@@ -166,5 +167,4 @@ def get_user_profile(db: Session = Depends(get_db), current_user: int = Depends(
     return user
 
 
-
-# TODO: soft skills CRUD 
+# TODO: soft skills CRUD
