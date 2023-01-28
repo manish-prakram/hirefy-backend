@@ -24,6 +24,11 @@ def login(user_creds: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Invalid Credentials!!!!!")
 
+    if user.emailVerified == False:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email not verified!!! 😔")
+
     access_token = oauth2.create_access_token(data={"user_id": user.id})
 
     return {
