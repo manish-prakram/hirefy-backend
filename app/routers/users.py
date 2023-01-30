@@ -114,7 +114,7 @@ def get_user(id: int, db: Session = Depends(get_db)):
 # ----------------------------------------------------------- Candidate Profile  ------------------------------------------------------------- #
 
 
-@router.post('/profile', status_code=status.HTTP_201_CREATED)
+@router.post('/details', status_code=status.HTTP_201_CREATED)
 async def create_user_profile(request: Request, body: user_profile_schema.CreateUserProfile, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user),):
 
     if current_user.profileType != 1:
@@ -137,7 +137,7 @@ async def create_user_profile(request: Request, body: user_profile_schema.Create
     return user_profile
 
 
-@router.patch('/profile', status_code=status.HTTP_200_OK, response_model=user_profile_schema.ResponseUserProfile)
+@router.patch('/details', status_code=status.HTTP_200_OK, response_model=user_profile_schema.ResponseUserProfile)
 async def update_user_profile(body: user_profile_schema.UpdateUserProfile, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
 
     query_userProfile = db.query(models.UserProfile).filter(
@@ -155,16 +155,27 @@ async def update_user_profile(body: user_profile_schema.UpdateUserProfile, db: S
     return userProfile
 
 
-@router.get('/profile/me', response_model=user_profile_schema.ResponseUserProfile)
+@router.get('/details/me')
 def get_user_profile(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user),):
 
     user = db.query(models.UserProfile).filter(models.UserProfile.profileId ==
                                                current_user.id).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Data does not exist")
+                            detail=f"user details not created")
     print(user)
     return user
 
 
-# TODO: soft skills CRUD
+@router.get('/details/{id}', response_model=user_profile_schema.ResponseUserProfile)
+def get_user_profile(id: int, db: Session = Depends(get_db),):
+
+    user = db.query(models.UserProfile).filter(models.UserProfile.profileId ==
+                                               id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"user details with id: {id} not found")
+    print(user)
+    return user
+
+
