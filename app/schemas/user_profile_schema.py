@@ -67,8 +67,9 @@ class UpdateUserProfile(BaseModel):
         orm_mode = True
 
 
-
 class ResponseUserProfile(BaseModel):
+    id: int
+    profileId: int
     currentJobTitle: str
     totalExperience: str
     currentCompany: str
@@ -95,6 +96,8 @@ class ResponseUserProfile(BaseModel):
     phd: str = None
     deplomaCourse: str = None
     owner: schemas.UserResponse
+    lastLogin: datetime
+    createdAt: datetime
     # techSkills: TechnicalSkillsResponse
 
     class Config:
