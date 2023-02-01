@@ -24,9 +24,9 @@ async def get_user_experiences(profileId: int, db: Session = Depends(get_db)):
     query_Experience = db.query(user_model.Experience).filter(
         user_model.Experience.userProfileId == profileId).order_by(user_model.Experience.id).all()
 
-    if not query_Experience:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Data does not exist")
+    # if not query_Experience:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+    #                         detail=f"Data does not exist")
 
     return query_Experience
 

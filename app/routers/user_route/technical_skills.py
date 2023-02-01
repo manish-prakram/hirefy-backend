@@ -31,9 +31,9 @@ async def get_user_technical_skills(profileId: int, db: Session = Depends(get_db
     query_techSkills = db.query(models.TechnicalSkills).filter(
         models.TechnicalSkills.userProfileId == profileId).order_by(models.TechnicalSkills.id).all()
 
-    if not query_techSkills:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Data does not exist")
+    # if not query_techSkills:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+    #                         detail=f"Data does not exist")
 
     return query_techSkills
 

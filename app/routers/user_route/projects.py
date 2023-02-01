@@ -24,9 +24,9 @@ async def get_user_project(profileId: int, db: Session = Depends(get_db)):
     query_project = db.query(user_model.Projects).filter(
         user_model.Projects.userProfileId == profileId).order_by(user_model.Projects.id).all()
 
-    if not query_project:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Data does not exist")
+    # if not query_project:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+    #                         detail=f"Data does not exist")
 
     return query_project
 

@@ -24,9 +24,9 @@ async def get_user_educations(profileId: int, db: Session = Depends(get_db)):
     query_education = db.query(user_model.Education).filter(
         user_model.Education.userProfileId == profileId).order_by(user_model.Education.id).all()
 
-    if not query_education:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Data does not exist")
+    # if not query_education:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+    #                         detail=f"Data does not exist")
 
     return query_education
 
