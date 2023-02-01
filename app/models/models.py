@@ -72,27 +72,34 @@ class User(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     email = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
-    created_at = Column(TIMESTAMP(timezone=True),
-                        server_default=text('now()'), nullable=False)
     firstName = Column(String)
+    middleName = Column(String)
     lastName = Column(String)
     dateOfBirth = Column(String)
     age = Column(String)
     gender = Column(String)
     profilePicUrl = Column(String)
+    coverPicUrl = Column(String)
     phone_number = Column(String)
     phoneVerified = Column(Boolean, server_default='FALSE', nullable=False)
     emailVerified = Column(Boolean, server_default='FALSE', nullable=False)
     isVerified = Column(Boolean, server_default='FALSE', nullable=False)
     isBlocked = Column(Boolean, server_default='FALSE', nullable=False)
     otpCode = Column(String)
+    profileId = Column(Integer)
     deviceType = Column(String)
-    lastLogin = Column(TIMESTAMP(timezone=True),
-                       server_default=text('now()'), nullable=False)
+    appVersion = Column(String)
+    isLoggedIn = Column(Integer, server_default='0', nullable=False)
     workEmail = Column(String)
     profileType = Column(Integer)
+    currentLocation = Column(String)
+    latitude = Column(String)
+    longitude = Column(String)
     requisitionId = Column(Integer)
-    profileId = Column(Integer)
+    lastLogin = Column(TIMESTAMP(timezone=True),
+                       server_default=text('now()'), nullable=False)
+    created_at = Column(TIMESTAMP(timezone=True),
+                        server_default=text('now()'), nullable=False)
 
 
 class UserProfile(Base):

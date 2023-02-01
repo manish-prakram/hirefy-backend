@@ -6,6 +6,7 @@ from fastapi import Response, status, HTTPException, Depends, APIRouter, Request
 from .. import utils, oauth2
 from app.models import models
 from app.schemas import schemas, user_profile_schema
+from app.schemas.user_schemas import user_schema
 from ..database import get_db, engine
 from sqlalchemy.orm import Session
 from app.email import Email
@@ -63,6 +64,25 @@ async def create_user(request: Request, user: schemas.CreateUser, db: Session = 
                             detail='There was an error sending email')
 
     return {'status': 'success', 'message': 'Verification token successfully sent to your email'}
+
+
+@router.patch('/', status_code=status.HTTP_200_OK)
+def update_user_details(user: user_schema.UpdateUser, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+
+    user_query = db.query(models.User).filter(
+        models.User.id == current_user.id)
+
+    user_found = user_query.first()
+
+    if user_found.id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail=f"Forbidden Request")
+
+    user_query.update(user.dict(exclude_unset=True), synchronize_session=False)
+    db.commit()
+    db.refresh(user_found)
+
+    return {"code": status.HTTP_200_OK,"message": "Successfully updated", "data": user_found}
 
 
 @router.patch('/profile-type', status_code=status.HTTP_200_OK)
@@ -177,5 +197,3 @@ def get_user_profile(id: int, db: Session = Depends(get_db),):
                             detail=f"user details with id: {id} not found")
     print(user)
     return user
-
-
