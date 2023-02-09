@@ -6,25 +6,25 @@ from ..schemas import recruiter_schema, schemas
 
 
 class PostBase(BaseModel):
-    title: str
-    description: str
-    salaryRange: str
-    communicationLang: str
-    joiningPeriod: str
-    workLocation: str
-    officeLocation: str
-    jobType: str
-    jobLevel: str
-    jobStage: str
-    jobDomain: str
-    educationLevel: str
-    experienceLevel: str
-    numberOfPositionOpen: str
-    rolesAndResponsibilities: str
-    reportingTo: str
-    screeningRounds: str
+    title: Optional[str]
+    description: Optional[str]
+    salaryRange: Optional[str]
+    communicationLang: Optional[str]
+    joiningPeriod: Optional[str]
+    workLocation: Optional[str]
+    officeLocation: Optional[str]
+    jobType: Optional[str]
+    jobLevel: Optional[str]
+    jobStage: Optional[str]
+    jobDomain: Optional[str]
+    educationLevel: Optional[str]
+    experienceLevel: Optional[str]
+    numberOfPositionOpen: Optional[str]
+    rolesAndResponsibilities: Optional[str]
+    reportingTo: Optional[str]
+    screeningRounds: Optional[str]
     backgroundVerificationApplicable: bool
-    benifitsProvided: str
+    benifitsProvided: Optional[str]
 
 
 class PostCreate(PostBase):
