@@ -56,8 +56,11 @@ async def get_my_company(db: Session = Depends(get_db), current_user: int = Depe
                          synchronize_session=False)
 
     if not company:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Data does not exist")
+        return JSONResponse(jsonable_encoder({
+            'status_code': 404,
+            'message': 'Recruiter not created yet',
+            'data': []
+        }))
 
     db.commit()
     db.refresh(current_user)

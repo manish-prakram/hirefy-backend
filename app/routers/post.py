@@ -1,7 +1,9 @@
 from typing import List, Optional
 from fastapi import Response, status, HTTPException, Depends, APIRouter
+from fastapi.responses import JSONResponse
 from ..schemas import posts_schema
 from ..models import models
+from fastapi.encoders import jsonable_encoder
 
 from ..database import get_db, engine
 from sqlalchemy.orm import Session
@@ -34,9 +36,8 @@ async def get_my_all_posts(db: Session = Depends(get_db), current_user: int = De
     post = db.query(models.Post, func.count(models.Review.post_id).label("reviews")).join(
         models.Review, models.Review.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.owner_id == current_user.id).all()
 
-    if not post:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"No data found with id: {id}")
+    # if not post:
+    #     return JSONResponse(content=f'No post found with id: {current_user.id}')
 
     return post
 
@@ -49,8 +50,11 @@ async def get_one_post(id: int, db: Session = Depends(get_db), ):
         models.Review, models.Review.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.id == id).first()
 
     if not post:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"No data found with id: {id}")
+        return JSONResponse(jsonable_encoder({
+            'status_code': 404,
+            'message': f'Post does not exist with id: {id}',
+            'data': []
+        }))
 
     return post
 
@@ -102,6 +106,7 @@ async def delete_post(id: int, db: Session = Depends(get_db), current_user: int 
     if post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"No data found with id: {id}")
+
     if post.owner_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail=f"Forbidden Request!")

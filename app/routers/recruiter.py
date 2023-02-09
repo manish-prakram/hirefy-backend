@@ -31,8 +31,12 @@ def get_my_profile(db: Session = Depends(get_db), current_user: int = Depends(oa
                            synchronize_session=False)
 
     if not recruiter:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Data does not exist")
+        return JSONResponse(jsonable_encoder({
+            'status_code': 404,
+            'message': 'Recruiter not created yet',
+            'data': []
+        }))
+
     db.commit()
     db.refresh(recruiter)
     db.refresh(current_user)
