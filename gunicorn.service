@@ -1,0 +1,14 @@
+[Unit]
+Description=hyreblock api service
+After=network.target
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/hirefy-backend
+Environment="PATH=/home/ubuntu/hirefy-backend/venv/bin"
+EnvironmentFile=/home/ubuntu/.env
+ExecStart=/home/ubuntu/hirefy-backend/venv/bin/gunicorn --workers 4 -k uvicorn.workers.UvicornWorker app.main:app --bind 0.0.0.0:8000
+
+[Install]
+WantedBy=multi-user.target

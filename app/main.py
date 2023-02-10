@@ -20,12 +20,7 @@ templates = Jinja2Templates(directory="app/templates/")
 
 
 origins = [
-    "http://localhost",
-    "http://localhost:8080",
-    "http://localhost:8000",
-    'https://dev7210.d27c7alg801bz2.amplifyapp.com',
-    'http://127.0.0.1:8000',
-    'http://127.0.0.1',
+    "*"
 ]
 
 app.add_middleware(
