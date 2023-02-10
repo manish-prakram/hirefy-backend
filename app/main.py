@@ -20,7 +20,6 @@ templates = Jinja2Templates(directory="app/templates/")
 
 
 origins = [
-    "*",
     "http://localhost",
     "http://localhost:8080",
     "http://localhost:8000",
