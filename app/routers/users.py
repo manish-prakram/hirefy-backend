@@ -2,7 +2,7 @@ import hashlib
 import smtplib
 from random import randbytes
 from typing import List
-from fastapi import Response, status, HTTPException, Depends, APIRouter, Request
+from fastapi import Response, status, HTTPException, Depends, APIRouter, Request, File, UploadFile, Form
 from .. import utils, oauth2
 from app.models import models
 from app.schemas import schemas, user_profile_schema
@@ -10,6 +10,8 @@ from app.schemas.user_schemas import user_schema
 from ..database import get_db, engine
 from sqlalchemy.orm import Session
 from app.email import Email
+from cloudinary import uploader
+from cloudinary.utils import cloudinary_url, cloudinary_api_url
 
 router = APIRouter(
     prefix='/users',
@@ -79,10 +81,11 @@ def update_user_details(user: user_schema.UpdateUser, db: Session = Depends(get_
             status_code=status.HTTP_403_FORBIDDEN, detail=f"Forbidden Request")
 
     user_query.update(user.dict(exclude_unset=True), synchronize_session=False)
+
     db.commit()
     db.refresh(user_found)
 
-    return {"code": status.HTTP_200_OK,"message": "Successfully updated", "data": user_found}
+    return {"code": status.HTTP_200_OK, "message": "Successfully updated", "data": user_found}
 
 
 @router.patch('/profile-type', status_code=status.HTTP_200_OK)
@@ -128,3 +131,22 @@ def get_user(id: int, db: Session = Depends(get_db)):
                             detail=f"Data does not exist with {id}")
     return user
 
+
+@router.post("/uploadimage/")
+async def upload_image(file: UploadFile | None = None, current_user: int = Depends(oauth2.get_current_user),):
+
+    if not file:
+        return {"message": "No upload file sent"}
+
+    if file.content_type != 'image/png' and file.content_type != 'image/jpeg':
+        return {'error': 'invalid image format'}
+
+    res = uploader.upload(
+        file=file.file, use_filename=True, unique_filename=True, folder='hyreblock')
+
+    # url, options = cloudinary_url(
+    #     "olympic_flag", width=100, height=100, crop="fill")
+
+    url = res.get('secure_url')
+
+    return {'response': res, 'url': url}

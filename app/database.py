@@ -5,6 +5,8 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
 from .config import settings
+import cloudinary 
+
 
 SQLALCHEMY_DATABASE_URL = f'postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}/{settings.database_name}'
 
@@ -20,6 +22,16 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+# ----------------------------- Cloudinery Config --------------------------- #
+# Config
+cloudinary.config(
+  cloud_name = settings.cd_cloud_name,
+  api_key = settings.cd_api_key,
+  api_secret = settings.cd_api_secret,
+#   secure = true
+)
 
 
 

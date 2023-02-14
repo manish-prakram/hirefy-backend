@@ -17,6 +17,10 @@ class Setting(BaseSettings):
     email_password: str
     email_from: str
 
+    cd_cloud_name: str
+    cd_api_key: str
+    cd_api_secret: str
+
     class Config:
         env_file = ".env"
 
