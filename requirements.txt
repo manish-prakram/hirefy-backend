@@ -58,4 +58,4 @@ uvicorn==0.20.0
 uvitools==0.0.4
 watchfiles==0.18.1
 websockets==10.4
-Werkzeug==2.2.2
+Werkzeug==2.2.3
