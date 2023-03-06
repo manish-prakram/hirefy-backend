@@ -6,6 +6,7 @@ __pycache__/
 postgres_aws_cred.txt
 deta_micro.txt
 aws_env.txt
+other_envs.txt
 
 # Distribution / packaging
 .Python

@@ -47,7 +47,8 @@ class PostResponse(PostBase):
 
 class PostOut(BaseModel):
     Post: PostResponse
-    reviews: int
+    applicants: int
+    # reviews: int
     # RecruiterProfile: recruiter_schema.RecruiterResponse
 
     class Config:

@@ -2,7 +2,7 @@ from typing import List, Optional
 from fastapi import Response, status, HTTPException, Depends, APIRouter
 from fastapi.responses import JSONResponse
 from ..schemas import posts_schema
-from ..models import models
+from ..models import models, applications_model
 from fastapi.encoders import jsonable_encoder
 
 from ..database import get_db, engine
@@ -18,15 +18,30 @@ router = APIRouter(
 
 # ! Get All Posts Without Login
 @router.get('/', response_model=List[posts_schema.PostOut])
+# @router.get('/',)
 def get_all_posts(db: Session = Depends(get_db), limit: int = 10, skip: int = 0, search: Optional[str] = ""):
 
-    result = db.query(models.Post, func.count(models.Review.post_id).label("reviews")).join(
-        models.Review, models.Review.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(
-        models.Post.title.contains(search)).limit(limit).offset(skip).all()
+    # result = db.query(models.Post, func.count(models.Review.post_id).label("reviews")).join(
+    #     models.Review, models.Review.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(
+    #     models.Post.title.contains(search)).limit(limit).offset(skip).all()
 
-    # posts = db.query(models.Post).filter(models.Post.owner_id == current_user.id).all() ## For same user posts only
+    # post = db.query(models.Post).filter(
+    #     models.Post.title.contains(search)).limit(limit).offset(skip).all()
 
-    return result
+    # FINE
+
+    query_result = db.query(models.Post, func.count(applications_model.Applications.postId).label("applicants")
+                            ).join(applications_model.Applications, applications_model.Applications.postId == models.Post.id, isouter=True
+                                   ).group_by(models.Post.id)
+
+    print(query_result)
+
+    final_result = query_result.filter(models.Post.title.ilike(f"%{search}%")).order_by(
+        models.Post.id).limit(limit).offset(skip).all()
+
+    print(final_result)
+
+    return final_result
 
 
 # ! Get my all posts
@@ -46,8 +61,9 @@ async def get_my_all_posts(db: Session = Depends(get_db), current_user: int = De
 @router.get('/{id}', status_code=status.HTTP_200_OK, response_model=posts_schema.PostOut)
 async def get_one_post(id: int, db: Session = Depends(get_db), ):
 
-    post = db.query(models.Post, func.count(models.Review.post_id).label("reviews")).join(
-        models.Review, models.Review.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.id == id).first()
+    post = db.query(models.Post, func.count(applications_model.Applications.postId).label("applicants")
+                    ).outerjoin(applications_model.Applications, applications_model.Applications.postId == models.Post.id
+                                ).group_by(models.Post.id).filter(models.Post.id == id).first()
 
     if not post:
         return JSONResponse(jsonable_encoder({

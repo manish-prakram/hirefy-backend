@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from . import models
 from .database import engine
 from .routers import users, candidate, auth, recruiter, post, company
-
+from .routers import applications
 from .routers.user_route import soft_skills, technical_skills, education, experience, certificates, projects
 
 from .config import settings
@@ -34,6 +34,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(candidate.router)
+app.include_router(applications.router)
 app.include_router(recruiter.router)
 app.include_router(post.router)
 app.include_router(company.router)

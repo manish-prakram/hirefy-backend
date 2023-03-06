@@ -7,6 +7,7 @@ from app.config import settings
 
 from alembic import context
 from app.models.user_model import Education, Experience
+from app.models.applications_model import Applications
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

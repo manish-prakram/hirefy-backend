@@ -31,3 +31,37 @@ class UpdateUser(BaseModel):
     otpCode: Optional[str]
     deviceType: Optional[str]
     appVersion: Optional[str]
+
+
+class UserResponse(BaseModel):
+    id: int
+    firstName: str = None
+    middleName: str = None
+    lastName: str = None
+    email: str = None
+    workEmail: str = None
+    gender: str = None
+    dateOfBirth: str = None
+    age: str = None
+    phone_number: str = None
+    currentLocation: str = None
+    latitude: str = None
+    longitude: str = None
+    profilePicUrl: str = None
+    coverPicUrl: str = None
+    profileType: int = None
+    phoneVerified: bool = None
+    emailVerified: bool = None
+    requisitionId: int = None
+    profileId: int = None
+    isVerified: bool = None
+    isBlocked: bool = None
+    isLoggedIn: int = None
+    otpCode: str = None
+    deviceType: str = None
+    appVersion: str = None
+    lastLogin: datetime = None
+    created_at: datetime = None
+
+    class Config:
+        orm_mode = True

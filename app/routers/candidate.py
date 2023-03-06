@@ -4,7 +4,14 @@ from random import randbytes
 from typing import List
 from fastapi import Response, status, HTTPException, Depends, APIRouter, Request
 from .. import utils, oauth2
+
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
+# Models
 from app.models import models
+from app.models import applications_model
+# Schemas
+from app.schemas import schemas, applications_schema
 from app.schemas import schemas, user_profile_schema
 from app.schemas.user_schemas import user_schema
 from ..database import get_db, engine
@@ -72,7 +79,7 @@ def get_user_profile(db: Session = Depends(get_db), current_user: int = Depends(
             'message': 'Candidate not created yet',
             'data': []
         }
-        
+
     print(user)
     return user
 
@@ -87,3 +94,22 @@ def get_user_profile(id: int, db: Session = Depends(get_db),):
                             detail=f"Candidate details with id: {id} not found")
     print(user)
     return user
+
+
+@router.get('/applications/', response_model=List[applications_schema.CandidateAppliPostResponse], summary="Get My All Applied Applications")
+async def get_applications(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user),):
+
+    query = db.query(applications_model.Applications, models.Post).outerjoin(
+        models.Post, models.Post.id == applications_model.Applications.postId)
+
+    applications = query.filter(
+        applications_model.Applications.userId == current_user.id).all()
+
+    if not applications:
+        return JSONResponse(jsonable_encoder({
+            'status_code': 404,
+            'message': f'Application does not exist with user id: {current_user.id}',
+            'data': []
+        }))
+
+    return applications
